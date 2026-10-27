@@ -1,0 +1,1506 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Unraid Template Builder</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8c2f'/%3E%3Cstop offset='1' stop-color='%23e22828'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M9 12l7-4 7 4v8l-7 4-7-4z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M9 12l7 4 7-4M16 16v8' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --color-brand-200: #ffd3ad;
+      --color-brand-300: #ffb57d;
+      --color-brand-400: #ff9e52;
+      --color-brand-500: #ff8c2f;
+      --color-brand-600: #f2622a;
+      --color-brand-700: #e22828;
+    }
+
+    @layer base {
+      html { scrollbar-gutter: stable; }
+      body { @apply bg-zinc-950 font-sans text-zinc-200 antialiased; }
+      ::selection { @apply bg-brand-500/30 text-white; }
+      * { scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / 0.12) transparent; }
+      select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.65rem center; background-size: 1rem; appearance: none; }
+      select option, select optgroup { background-color: #18181b; color: #e4e4e7; }
+    }
+
+    @layer components {
+      .card { @apply rounded-2xl border border-white/[0.06] bg-zinc-900/60 p-5 shadow-xl shadow-black/20 sm:p-6; }
+      .card-head { @apply mb-5 flex items-center gap-3; }
+      .card-title { @apply text-[15px] font-semibold tracking-tight text-zinc-100; }
+      .card-icon { @apply grid size-9 shrink-0 place-items-center rounded-xl bg-white/[0.04] text-zinc-300 ring-1 ring-white/[0.07]; }
+      .label { @apply mb-1.5 flex items-center gap-1 text-xs font-medium text-zinc-400; }
+      .card-title { @apply flex items-center gap-1.5; }
+      .tip-btn { @apply inline-grid size-4 shrink-0 cursor-pointer place-items-center rounded-full text-zinc-600 transition hover:text-zinc-200 focus-visible:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50; }
+      .tip-btn svg { @apply size-3.5; }
+      .step-btn { @apply grid size-6 cursor-pointer place-items-center rounded-md text-zinc-500 transition hover:bg-white/[0.07] hover:text-zinc-100 active:scale-90 disabled:pointer-events-none disabled:opacity-30; }
+      .step-btn svg { @apply size-3.5; }
+      #tip-body code { @apply rounded-md bg-white/[0.07] px-1 py-px font-mono text-[11.5px] text-brand-200; }
+      #tip-body b { @apply font-semibold text-zinc-50; }
+      #tip-body code { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+      #tip-body code.nw { white-space: nowrap; }
+      .input { @apply w-full rounded-xl border border-white/10 bg-zinc-950/60 px-3 py-2 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 hover:border-white/20 focus:border-brand-500/70 focus:ring-4 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:opacity-40 aria-[invalid=true]:border-red-500/60 aria-[invalid=true]:focus:ring-red-500/15; }
+      .input[readonly] { @apply cursor-default text-zinc-400 hover:border-white/10 focus:border-white/10 focus:ring-0; }
+      select.input { @apply cursor-pointer pr-9; }
+      textarea.input { @apply min-h-[5.5rem] resize-y leading-relaxed; }
+      .btn { @apply inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium whitespace-nowrap transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50; }
+      .btn svg { @apply size-4 shrink-0; }
+      .btn-primary { @apply bg-linear-to-br from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-600/20 hover:from-brand-400 hover:to-brand-500; }
+      .btn-secondary { @apply border border-white/10 bg-white/[0.04] text-zinc-200 hover:border-white/20 hover:bg-white/[0.08] hover:text-white; }
+      .btn-ghost { @apply text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-100; }
+      .icon-btn { @apply inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-zinc-500 transition hover:bg-white/[0.07] hover:text-zinc-100 active:scale-95 disabled:pointer-events-none disabled:opacity-25; }
+      .icon-btn svg { @apply size-4; }
+      .seg { @apply flex w-full gap-1 rounded-xl border border-white/10 bg-zinc-950/60 p-1; }
+      .seg > label { @apply flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2.5 py-1 text-center text-sm whitespace-nowrap text-zinc-400 transition hover:bg-white/[0.05] hover:text-zinc-200 has-[:checked]:bg-white/10 has-[:checked]:text-white has-[:checked]:shadow-sm has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-35 has-[:disabled]:hover:bg-transparent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500/40; }
+      .seg > label > input { @apply sr-only; }
+      .toggle-row { @apply relative flex min-h-[38px] cursor-pointer items-center justify-between gap-3 rounded-xl border border-white/10 bg-zinc-950/60 px-3 py-1.5 text-sm text-zinc-200 transition hover:border-white/20 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500/40; }
+      .toggle-row > input { @apply sr-only; }
+      .switch-track { @apply relative h-5 w-9 shrink-0 rounded-full bg-zinc-700 transition-colors peer-checked:bg-brand-500; }
+      .switch-track::after { content: ""; @apply absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-md transition-transform; }
+      .peer:checked ~ .switch-track::after { transform: translateX(1rem); }
+      .chip { @apply cursor-pointer rounded-lg border border-white/10 bg-zinc-950/40 px-2.5 py-1 text-xs font-medium text-zinc-400 transition select-none hover:border-white/25 hover:text-zinc-100 active:scale-95 aria-pressed:border-brand-500/50 aria-pressed:bg-brand-500/15 aria-pressed:text-brand-200; }
+      .adorn { @apply flex items-center border-white/10 bg-white/[0.03] px-3 font-mono text-xs text-zinc-500 select-none; }
+    }
+
+    .font-mono, .adorn, code { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+
+    .no-spin { appearance: textfield; -moz-appearance: textfield; }
+    .no-spin::-webkit-inner-spin-button, .no-spin::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+    /* Tooltip */
+    #tip { position: fixed; top: 0; left: 0; z-index: 60; visibility: hidden; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity .12s ease, transform .12s ease, visibility 0s linear .12s; }
+    #tip[data-place="bottom"] { transform: translateY(-4px); }
+    #tip[data-open="true"] { visibility: visible; opacity: 1; transform: none; transition: opacity .12s ease, transform .12s ease; }
+    #tip-arrow { position: absolute; width: 10px; height: 10px; background: #27272a; transform: rotate(45deg); }
+    #tip[data-place="top"] #tip-arrow { bottom: -6px; border-right: 1px solid rgb(255 255 255 / 0.1); border-bottom: 1px solid rgb(255 255 255 / 0.1); }
+    #tip[data-place="bottom"] #tip-arrow { top: -6px; border-left: 1px solid rgb(255 255 255 / 0.1); border-top: 1px solid rgb(255 255 255 / 0.1); }
+
+    /* XML preview */
+    .code-line { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); }
+    .code-line:hover { background: rgb(255 255 255 / 0.025); }
+    .code-ln { padding-right: 1rem; text-align: right; color: #52525b; user-select: none; }
+    .code-lc { padding-right: 1.25rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .nowrap .code-lc { white-space: pre; overflow-wrap: normal; }
+    .nowrap #code { width: max-content; min-width: 100%; }
+    .tok-pi { color: #71717a; }
+    .tok-punc { color: #71717a; }
+    .tok-tag { color: #ffb57d; }
+    .tok-attr { color: #93c5fd; }
+    .tok-val { color: #86efac; }
+    .tok-text { color: #e4e4e7; }
+
+    .glow { background: radial-gradient(60rem 30rem at 15% -10%, rgb(255 140 47 / 0.09), transparent 60%), radial-gradient(50rem 30rem at 100% 0%, rgb(226 40 40 / 0.06), transparent 60%); }
+    [data-collapsed="true"] [data-entry-body] { display: none; }
+    [data-collapsed="false"] [data-sum="detail"] { display: none; }
+    [data-collapsed="false"] [data-act="toggle"] [data-chevron] { transform: rotate(90deg); }
+  </style>
+</head>
+<body class="min-h-dvh">
+  <div class="glow pointer-events-none fixed inset-0 -z-10"></div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 border-b border-white/[0.06] bg-zinc-950/75 backdrop-blur-xl">
+    <div class="mx-auto flex h-16 max-w-[1600px] items-center gap-2.5 px-4 sm:gap-3 sm:px-6">
+      <div class="grid size-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-brand-500 to-brand-700 shadow-lg shadow-brand-700/25">
+        <svg viewBox="0 0 24 24" class="size-5 text-white" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8l8-4.5L20 8v8l-8 4.5L4 16z"/><path d="M4 8l8 4.5L20 8M12 12.5V20.5"/></svg>
+      </div>
+      <h1 class="truncate text-[15px] font-semibold tracking-tight text-zinc-50 sm:text-base">Unraid Template Builder</h1>
+      <div class="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+        <button type="button" class="btn btn-ghost px-2.5 sm:px-3.5" id="btn-import" title="Import an existing XML template">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+          <span class="hidden sm:inline">Import</span>
+        </button>
+        <button type="button" class="btn btn-ghost px-2.5 sm:px-3.5" id="btn-reset" title="Clear all fields">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <span class="hidden sm:inline" data-label>Reset</span>
+        </button>
+        <a class="icon-btn size-9" href="https://github.com/nick-hio/unraid-template-builder" target="_blank" rel="noopener" title="Source on GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="!size-[18px]"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
+    <!-- Form -->
+    <form id="form" class="flex min-w-0 flex-col gap-6" autocomplete="off" spellcheck="false" onsubmit="return false">
+
+      <!-- Container -->
+      <section class="card" id="sec-container">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8l8-4.5L20 8v8l-8 4.5L4 16z"/><path d="M4 8l8 4.5L20 8M12 12.5V20.5"/></svg>
+          </div>
+          <h2 class="card-title">Container</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="f-name" data-tip="name">Name</label>
+            <input class="input" id="f-name" data-bind="name" placeholder="plex">
+          </div>
+          <div>
+            <label class="label" for="f-repository" data-tip="repository">Repository</label>
+            <input class="input" id="f-repository" data-bind="repository" placeholder="lscr.io/linuxserver/plex:latest">
+          </div>
+          <div>
+            <label class="label" for="f-registry" data-tip="registry">Registry URL</label>
+            <input class="input" id="f-registry" data-bind="registry" placeholder="https://hub.docker.com/r/linuxserver/plex">
+          </div>
+          <div>
+            <label class="label" for="f-icon" data-tip="icon">Icon URL</label>
+            <div class="flex gap-2">
+              <div class="grid size-[38px] shrink-0 place-items-center overflow-hidden rounded-xl border border-white/10 bg-zinc-950/60 text-zinc-600">
+                <img id="icon-preview" alt="" class="hidden size-full object-contain p-1">
+                <svg id="icon-empty" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              </div>
+              <input class="input" id="f-icon" data-bind="icon" placeholder="https://example.com/icon.png">
+            </div>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="label" for="f-webui" data-tip="webui">WebUI</label>
+            <input class="input font-mono text-[13px]" id="f-webui" data-bind="webui" placeholder="http://[IP]:[PORT:32400]/web">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="label" for="f-overview" data-tip="overview">Overview</label>
+            <textarea class="input" id="f-overview" data-bind="overview" rows="4" placeholder="What the container does."></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="label" for="f-requires" data-tip="requires">Additional requirements</label>
+            <textarea class="input !min-h-[3.5rem]" id="f-requires" data-bind="requires" rows="2"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="label" data-tip="categories">Categories</span>
+            <div id="categories" class="flex flex-col gap-2.5 rounded-xl border border-white/10 bg-zinc-950/30 p-3"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Links -->
+      <section class="card" id="sec-links">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <h2 class="card-title">Links</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="f-support" data-tip="support">Support thread</label>
+            <input class="input" id="f-support" data-bind="support" placeholder="https://forums.unraid.net/topic/…">
+          </div>
+          <div>
+            <label class="label" for="f-project" data-tip="project">Project page</label>
+            <input class="input" id="f-project" data-bind="project" placeholder="https://example.com">
+          </div>
+          <div>
+            <label class="label" for="f-readme" data-tip="readme">Read me first</label>
+            <input class="input" id="f-readme" data-bind="readme" placeholder="https://github.com/…#readme">
+          </div>
+          <div>
+            <label class="label" for="f-templateurl" data-tip="templateURL">Template URL</label>
+            <input class="input" id="f-templateurl" data-bind="templateURL" placeholder="https://raw.githubusercontent.com/…/plex.xml">
+          </div>
+          <div>
+            <label class="label" for="f-donatetext" data-tip="donateText">Donation text</label>
+            <input class="input" id="f-donatetext" data-bind="donateText">
+          </div>
+          <div>
+            <label class="label" for="f-donatelink" data-tip="donateLink">Donation link</label>
+            <input class="input" id="f-donatelink" data-bind="donateLink" placeholder="https://…">
+          </div>
+        </div>
+      </section>
+
+      <!-- Network -->
+      <section class="card" id="sec-network">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+          </div>
+          <h2 class="card-title">Network</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <span class="label" data-tip="network">Network type</span>
+            <div class="seg flex-wrap sm:flex-nowrap">
+              <label><input type="radio" name="network" value="bridge" data-bind="network">Bridge</label>
+              <label><input type="radio" name="network" value="host" data-bind="network">Host</label>
+              <label><input type="radio" name="network" value="container" data-bind="network">Container</label>
+              <label><input type="radio" name="network" value="none" data-bind="network">None</label>
+              <label><input type="radio" name="network" value="custom" data-bind="network">Custom</label>
+            </div>
+          </div>
+          <div data-show="net-custom">
+            <label class="label" for="f-customnet" data-tip="customNetwork">Custom network</label>
+            <input class="input font-mono text-[13px]" id="f-customnet" data-bind="customNetwork" placeholder="br0">
+          </div>
+          <div data-show="net-container">
+            <label class="label" for="f-containernet" data-tip="containerNetwork">Container to use</label>
+            <input class="input" id="f-containernet" data-bind="containerNetwork" placeholder="gluetun">
+          </div>
+          <div data-show="net-custom">
+            <label class="label" for="f-myip" data-tip="myIP">Fixed IP address</label>
+            <input class="input font-mono text-[13px]" id="f-myip" data-bind="myIP" placeholder="192.168.1.50">
+          </div>
+          <div data-show="net-mac">
+            <label class="label" for="f-mymac" data-tip="myMAC">Fixed MAC address</label>
+            <input class="input font-mono text-[13px]" id="f-mymac" data-bind="myMAC" placeholder="02:42:ac:11:00:02">
+          </div>
+          <div data-show="net-extra">
+            <label class="label" for="f-extranet" data-tip="extraNetworks">Additional networks</label>
+            <input class="input font-mono text-[13px]" id="f-extranet" data-bind="extraNetworks" placeholder="proxynet, br1">
+          </div>
+        </div>
+      </section>
+
+      <!-- Runtime -->
+      <section class="card" id="sec-runtime">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg>
+          </div>
+          <h2 class="card-title">Runtime</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <span class="label" data-tip="shell">Console shell</span>
+            <div class="seg">
+              <label><input type="radio" name="shell" value="sh" data-bind="shell">sh</label>
+              <label><input type="radio" name="shell" value="bash" data-bind="shell">bash</label>
+            </div>
+          </div>
+          <div>
+            <span class="label" data-tip="privileged">Privileged</span>
+            <label class="toggle-row">
+              <input type="checkbox" class="peer" data-bind="privileged">
+              <span class="text-zinc-500 peer-checked:hidden">Off</span><span class="hidden peer-checked:inline">On</span>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="label" for="f-extraparams" data-tip="extraParams">Extra parameters</label>
+            <input class="input font-mono text-[13px]" id="f-extraparams" data-bind="extraParams" placeholder="--restart=unless-stopped --gpus=all">
+          </div>
+          <div>
+            <label class="label" for="f-postargs" data-tip="postArgs">Post arguments</label>
+            <input class="input font-mono text-[13px]" id="f-postargs" data-bind="postArgs" placeholder="&& docker exec …">
+          </div>
+          <div>
+            <label class="label" for="f-memory" data-tip="memory">Memory limit</label>
+            <input class="input font-mono text-[13px]" id="f-memory" data-bind="memory" placeholder="unlimited (e.g. 512m, 2g)">
+          </div>
+          <div class="sm:col-span-2">
+            <div class="mb-1.5 flex items-center justify-between gap-3">
+              <span class="label !mb-0" data-tip="cpu">CPU pinning</span>
+              <div class="flex items-center gap-3">
+                <button type="button" class="cursor-pointer rounded-md px-1 text-xs font-medium text-zinc-500 transition hover:text-zinc-200" id="cpu-clear">Clear</button>
+                <span class="label !mb-0" data-tip="cpuThreads">Threads</span>
+                <div class="flex items-center rounded-lg border border-white/10 bg-zinc-950/60 p-0.5 transition hover:border-white/20 focus-within:border-brand-500/70 focus-within:ring-4 focus-within:ring-brand-500/15">
+                  <button type="button" class="step-btn" data-step="-1" aria-label="Fewer threads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+                  <input class="no-spin w-[3.5ch] bg-transparent text-center font-mono text-xs text-zinc-100 outline-none" id="f-threads" type="number" inputmode="numeric" min="1" max="256" aria-label="Threads" data-bind="cpuThreads">
+                  <button type="button" class="step-btn" data-step="1" aria-label="More threads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                </div>
+              </div>
+            </div>
+            <div id="cpus" class="flex flex-wrap gap-1.5 rounded-xl border border-white/10 bg-zinc-950/30 p-3"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Configs -->
+      <section class="card" id="sec-configs">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" class="size-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+          </div>
+          <h2 class="card-title" data-tip="configs">Configuration</h2>
+          <span id="config-count" class="ml-auto rounded-lg bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-zinc-400">0</span>
+        </div>
+        <div id="configs" class="mb-3 flex flex-col gap-2.5"></div>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-5" id="config-add"></div>
+      </section>
+
+      <!-- Tailscale -->
+      <section class="card" id="sec-tailscale">
+        <div class="flex items-center gap-3">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" class="size-[18px]" fill="currentColor"><circle cx="5" cy="5" r="2.2" opacity=".35"/><circle cx="12" cy="5" r="2.2" opacity=".35"/><circle cx="19" cy="5" r="2.2" opacity=".35"/><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="19" r="2.2" opacity=".35"/><circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2" opacity=".35"/></svg>
+          </div>
+          <h2 class="card-title" data-tip="ts.enabled">Tailscale</h2>
+          <span id="ts-blocked" class="hidden rounded-lg bg-white/[0.04] px-2 py-0.5 text-xs text-zinc-500">Needs Bridge, None, or Custom network</span>
+          <label class="ml-auto inline-flex cursor-pointer items-center has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40" title="Use Tailscale">
+            <input type="checkbox" class="peer sr-only" data-bind="ts.enabled" id="f-ts-enabled">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div data-show="ts-on" class="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label" for="f-ts-hostname" data-tip="ts.hostname">Hostname</label>
+            <input class="input" id="f-ts-hostname" data-bind="ts.hostname" placeholder="plex">
+          </div>
+          <div>
+            <span class="label" data-tip="ts.isExitNode">Be an exit node</span>
+            <div class="seg">
+              <label><input type="radio" name="ts-exit" value="false" data-bind="ts.isExitNode">No</label>
+              <label><input type="radio" name="ts-exit" value="true" data-bind="ts.isExitNode">Yes</label>
+            </div>
+          </div>
+          <div>
+            <label class="label" for="f-ts-exitip" data-tip="ts.exitNodeIP">Use an exit node</label>
+            <input class="input font-mono text-[13px]" id="f-ts-exitip" data-bind="ts.exitNodeIP" placeholder="IP or hostname of the exit node">
+          </div>
+          <div>
+            <span class="label" data-tip="ts.userspace">Userspace networking</span>
+            <div class="seg">
+              <label><input type="radio" name="ts-us" value="true" data-bind="ts.userspace">Enabled</label>
+              <label><input type="radio" name="ts-us" value="false" data-bind="ts.userspace">Disabled</label>
+            </div>
+          </div>
+          <div data-show="ts-lan">
+            <span class="label" data-tip="ts.lanAccess">Allow LAN access</span>
+            <div class="seg">
+              <label><input type="radio" name="ts-lan" value="false" data-bind="ts.lanAccess">No</label>
+              <label><input type="radio" name="ts-lan" value="true" data-bind="ts.lanAccess">Yes</label>
+            </div>
+          </div>
+          <div>
+            <span class="label" data-tip="ts.ssh">Tailscale SSH</span>
+            <div class="seg">
+              <label><input type="radio" name="ts-ssh" value="false" data-bind="ts.ssh">No</label>
+              <label><input type="radio" name="ts-ssh" value="true" data-bind="ts.ssh">Yes</label>
+            </div>
+          </div>
+          <div>
+            <span class="label" data-tip="ts.serve">Serve</span>
+            <div class="seg">
+              <label><input type="radio" name="ts-serve" value="no" data-bind="ts.serve">No</label>
+              <label><input type="radio" name="ts-serve" value="serve" data-bind="ts.serve">Serve</label>
+              <label><input type="radio" name="ts-serve" value="funnel" data-bind="ts.serve">Funnel</label>
+            </div>
+          </div>
+          <div data-show="ts-serve">
+            <label class="label" for="f-ts-serveport" data-tip="ts.servePort">Serve port</label>
+            <input class="input font-mono text-[13px]" id="f-ts-serveport" data-bind="ts.servePort" placeholder="Detected from WebUI if empty">
+          </div>
+
+          <div class="sm:col-span-2">
+            <button type="button" id="ts-adv-toggle" class="group flex w-full cursor-pointer items-center gap-2 rounded-xl px-1 py-1 text-sm font-medium text-zinc-400 transition hover:text-zinc-100" aria-expanded="false">
+              <svg viewBox="0 0 24 24" class="size-4 transition-transform group-aria-expanded:rotate-90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              Advanced settings
+              <span class="h-px flex-1 bg-white/[0.06]"></span>
+            </button>
+          </div>
+
+          <div data-show="ts-adv ts-serve">
+            <label class="label" for="f-ts-servetarget" data-tip="ts.serveTarget">Serve target</label>
+            <input class="input font-mono text-[13px]" id="f-ts-servetarget" data-bind="ts.serveTarget">
+          </div>
+          <div data-show="ts-adv ts-serve">
+            <label class="label" for="f-ts-servelocal" data-tip="ts.serveLocalPath">Serve local path</label>
+            <input class="input font-mono text-[13px]" id="f-ts-servelocal" data-bind="ts.serveLocalPath">
+          </div>
+          <div data-show="ts-adv ts-serve">
+            <label class="label" for="f-ts-serveproto" data-tip="ts.serveProtocol">Serve protocol</label>
+            <input class="input font-mono text-[13px]" id="f-ts-serveproto" data-bind="ts.serveProtocol" placeholder="https">
+          </div>
+          <div data-show="ts-adv ts-serve">
+            <label class="label" for="f-ts-serveprotoport" data-tip="ts.serveProtocolPort">Serve protocol port</label>
+            <input class="input font-mono text-[13px]" id="f-ts-serveprotoport" data-bind="ts.serveProtocolPort" placeholder="=443">
+          </div>
+          <div data-show="ts-adv ts-serve">
+            <label class="label" for="f-ts-servepath" data-tip="ts.servePath">Serve path</label>
+            <input class="input font-mono text-[13px]" id="f-ts-servepath" data-bind="ts.servePath">
+          </div>
+          <div data-show="ts-adv">
+            <label class="label" for="f-ts-webui" data-tip="ts.webui">Tailscale WebUI</label>
+            <input class="input font-mono text-[13px]" id="f-ts-webui" readonly tabindex="-1" placeholder="Set from WebUI">
+          </div>
+          <div data-show="ts-adv">
+            <label class="label" for="f-ts-routes" data-tip="ts.routes">Advertise routes</label>
+            <input class="input font-mono text-[13px]" id="f-ts-routes" data-bind="ts.routes" placeholder="192.168.1.0/24">
+          </div>
+          <div data-show="ts-adv">
+            <span class="label" data-tip="ts.acceptRoutes">Accept routes</span>
+            <div class="seg">
+              <label><input type="radio" name="ts-accept" value="false" data-bind="ts.acceptRoutes">No</label>
+              <label><input type="radio" name="ts-accept" value="true" data-bind="ts.acceptRoutes">Yes</label>
+            </div>
+          </div>
+          <div data-show="ts-adv">
+            <label class="label" for="f-ts-dparams" data-tip="ts.daemonParams">Daemon parameters</label>
+            <input class="input font-mono text-[13px]" id="f-ts-dparams" data-bind="ts.daemonParams">
+          </div>
+          <div data-show="ts-adv">
+            <label class="label" for="f-ts-params" data-tip="ts.extraParams">Extra parameters</label>
+            <input class="input font-mono text-[13px]" id="f-ts-params" data-bind="ts.extraParams">
+          </div>
+          <div data-show="ts-adv">
+            <label class="label" for="f-ts-statedir" data-tip="ts.stateDir">State directory</label>
+            <input class="input font-mono text-[13px]" id="f-ts-statedir" data-bind="ts.stateDir">
+          </div>
+          <div data-show="ts-adv">
+            <span class="label" data-tip="ts.troubleshooting">Troubleshooting packages</span>
+            <label class="toggle-row">
+              <input type="checkbox" class="peer" data-bind="ts.troubleshooting">
+              <span class="text-zinc-500 peer-checked:hidden">Off</span><span class="hidden peer-checked:inline">On</span>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <!-- Preview -->
+    <aside class="min-w-0 lg:sticky lg:top-[5.5rem] lg:h-[calc(100dvh-7rem)]">
+      <div class="flex h-[75dvh] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-zinc-900/60 shadow-xl shadow-black/20 lg:h-full">
+        <div class="flex flex-wrap items-center gap-2 border-b border-white/[0.06] p-3">
+          <div class="flex min-w-[14rem] flex-1 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/60 transition hover:border-white/20 focus-within:border-brand-500/70 focus-within:ring-4 focus-within:ring-brand-500/15">
+            <span class="adorn cursor-pointer border-r underline decoration-zinc-600 decoration-dotted underline-offset-4 transition hover:text-zinc-300 focus-visible:text-zinc-300 focus-visible:outline-none" data-tip-key="fileName" tabindex="0" aria-label="About the my- prefix">my-</span>
+            <input id="f-filename" class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px] text-zinc-100 outline-none placeholder:text-zinc-600" placeholder="container" aria-label="File name">
+            <span class="adorn border-l">.xml</span>
+          </div>
+          <button type="button" class="btn btn-secondary" id="btn-copy" title="Copy XML to clipboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-icon><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            <span data-label>Copy</span>
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-download" title="Download XML (Ctrl+S)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-icon><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+            <span data-label>Download</span>
+          </button>
+        </div>
+        <div id="issues" class="hidden flex-wrap gap-1.5 border-b border-white/[0.06] bg-red-500/[0.04] px-3 py-2.5"></div>
+        <div class="relative min-h-0 flex-1">
+          <button type="button" id="btn-wrap" class="icon-btn absolute top-2 right-3 z-10 bg-zinc-900/80 backdrop-blur aria-pressed:text-brand-300" aria-pressed="true" title="Wrap lines">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h15a3 3 0 1 1 0 6h-4"/><path d="m16 16-2 2 2 2"/><path d="M3 18h7"/></svg>
+          </button>
+          <div id="code-scroll" class="h-full overflow-auto py-3">
+            <div id="code" class="font-mono text-[12.5px] leading-6"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Drop overlay -->
+  <div id="drop" class="pointer-events-none fixed inset-0 z-50 hidden place-items-center bg-zinc-950/80 p-6 backdrop-blur-sm">
+    <div class="grid w-full max-w-md place-items-center gap-3 rounded-3xl border-2 border-dashed border-brand-500/60 bg-brand-500/[0.06] px-8 py-14 text-brand-200">
+      <svg viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+      <span class="text-sm font-medium">Drop XML to import</span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4 opacity-0 transition duration-200 translate-y-2">
+    <div class="pointer-events-auto flex items-center gap-3 rounded-2xl border border-white/10 bg-zinc-800/95 py-2 pr-2 pl-4 text-sm text-zinc-100 shadow-2xl shadow-black/40 backdrop-blur">
+      <span id="toast-msg"></span>
+      <button type="button" id="toast-action" class="btn btn-ghost hidden px-2.5 py-1 text-brand-300 hover:text-brand-200"></button>
+    </div>
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tip" role="tooltip" class="w-max max-w-[19rem] rounded-xl border border-white/10 bg-zinc-800 px-3 py-2 text-[12.5px] leading-relaxed text-zinc-200 shadow-2xl shadow-black/50">
+    <div id="tip-body"></div>
+    <span id="tip-arrow"></span>
+  </div>
+
+  <input type="file" id="file-import" accept=".xml,application/xml,text/xml" class="hidden">
+
+  <script>
+  (() => {
+    "use strict";
+
+    const STORAGE_KEY = "unraid-template-builder:v1";
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+    // ---------- Static data (from Unraid's Docker manager) ----------
+    const CATEGORY_GROUPS = [
+      { label: "General", items: [
+        ["AI:", "AI"], ["Backup:", "Backup"], ["Cloud:", "Cloud"], ["Crypto:", "Crypto"],
+        ["Downloaders:", "Downloaders"], ["Drivers:", "Drivers"], ["GameServers:", "Game Servers"],
+        ["HomeAutomation:", "Home Automation"], ["Productivity:", "Productivity"],
+        ["Security:", "Security"], ["Tools:", "Tools"], ["Other:", "Other"] ] },
+      { label: "Media App", items: ["Video", "Music", "Books", "Photos", "Other"].map(x => ["MediaApp:" + x, x]) },
+      { label: "Media Server", items: ["Video", "Music", "Books", "Photos", "Other"].map(x => ["MediaServer:" + x, x]) },
+      { label: "Network", items: ["Web", "DNS", "FTP", "Proxy", "Voip", "Management", "Messenger", "VPN", "Privacy", "Other"].map(x => ["Network:" + x, x]) },
+      { label: "Status", items: [["Status:Stable", "Stable"], ["Status:Beta", "Beta"]] },
+    ];
+    const CATEGORY_ORDER = CATEGORY_GROUPS.flatMap(g => g.items.map(i => i[0]));
+
+    const ICONS = {
+      Path: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+      Port: '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
+      Variable: '<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/>',
+      Label: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+      Device: '<path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M6 16h.01M10 16h.01"/>',
+      up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+      down: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+      chevron: '<path d="m9 18 6-6-6-6"/>',
+      dup: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/><path d="M15 12v6M12 15h6"/>',
+      trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+      plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+      check: '<path d="M20 6 9 17l-5-5"/>',
+      alert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+      info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+    };
+    const svg = (name, cls = "size-4") =>
+      `<svg viewBox="0 0 24 24" class="${cls}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+
+    const TYPES = {
+      Path:     { tone: "text-sky-300 bg-sky-500/10 ring-sky-500/20",             target: "Container path", value: "Host path",  tp: "/config", vp: "/mnt/user/appdata/app", modes: [["rw", "Read/Write"], ["rw,slave", "Read/Write – Slave"], ["rw,shared", "Read/Write – Shared"], ["ro", "Read only"], ["ro,slave", "Read only – Slave"], ["ro,shared", "Read only – Shared"]] },
+      Port:     { tone: "text-emerald-300 bg-emerald-500/10 ring-emerald-500/20", target: "Container port", value: "Host port",  tp: "8080", vp: "8080", modes: [["tcp", "TCP"], ["udp", "UDP"]] },
+      Variable: { tone: "text-violet-300 bg-violet-500/10 ring-violet-500/20",    target: "Key",            value: "Value",      tp: "PUID", vp: "99", modes: null },
+      Label:    { tone: "text-amber-300 bg-amber-500/10 ring-amber-500/20",       target: "Key",            value: "Value",      tp: "com.example.key", vp: "value", modes: null },
+      Device:   { tone: "text-rose-300 bg-rose-500/10 ring-rose-500/20",          target: "",               value: "Device",     tp: "", vp: "/dev/dri", modes: null },
+    };
+    const DISPLAY = [["always", "Always"], ["always-hide", "Always · hide buttons"], ["advanced", "Advanced"], ["advanced-hide", "Advanced · hide buttons"]];
+
+    // ---------- Tooltip text (based on Unraid's own help text) ----------
+    const TIPS = {
+      name: "The container name in Docker and Unraid. Use 2 or more letters, digits, <code>_</code>, <code>.</code>, or <code>-</code>. The first character must be a letter or digit. Spaces are removed.",
+      repository: "The Docker image to pull, as <code>author/app</code>. Add <code>:tag</code> to pull a specific version, e.g. <code>lscr.io/linuxserver/plex:latest</code>.",
+      registry: "A link to the image's page on its registry, such as Docker Hub.",
+      icon: "A link to the app's icon image. Unraid shows it on the Docker and Dashboard pages.",
+      webui: "The address that the WebUI item in the container's menu opens. Unraid replaces <code>[IP]</code> with the container's IP, and <code>[PORT:8080]</code> with the host port mapped to container port 8080.",
+      overview: "A description of the app. Unraid shows it on the Add Container page. Basic HTML is allowed.",
+      requires: "Things the user must set up before installing, such as a plugin or a GPU driver. Basic HTML is allowed.",
+      categories: "The groups that the app belongs to, such as in Community Applications. Select one or more.",
+      support: "A link to the support thread or issue tracker. It shows as Support in the container's menu.",
+      project: "A link to the app's home page. It shows as Project Page in the container's menu.",
+      readme: "A link to a read-me file or setup guide. It shows in the container's menu.",
+      templateURL: "The address where this template is hosted. Unraid uses it to keep the template up to date.",
+      donateText: "The text that goes with the donation link.",
+      donateLink: "A link where users can donate to the developer.",
+      network: "<b>Bridge</b>: shares the server's IP. Only mapped ports are open.<br><b>Host</b>: uses the server's network directly. Port mappings do not apply.<br><b>Container</b>: uses the network of another container, such as a VPN.<br><b>None</b>: no network.<br><b>Custom</b>: a named Docker network, such as <code>br0</code>. The container can get its own IP.",
+      customNetwork: "The name of the Docker network, e.g. <code>br0</code>, <code>br0.10</code>, <code>eth0</code>, or a network you made, such as <code>proxynet</code>.",
+      containerNetwork: "The name of the container whose network this container uses. Use it to send traffic through a VPN container.",
+      myIP: "A static IP address on the custom network. Leave it empty to let Docker choose one.",
+      myMAC: "A static MAC address for the container. Use a unicast address. The first byte must be even, e.g. <code>02:42:9a:0d:7e:c0</code>.",
+      extraNetworks: "More custom networks to connect after Unraid creates the container, with <code>docker network connect</code>. Separate names with commas.",
+      shell: "The shell that opens when you select Console in the container's menu.",
+      privileged: "Gives the container full access to the server's devices and capabilities. Turn it on only if the app needs it.",
+      extraParams: "More <code>docker run</code> options, e.g. <code>--restart=unless-stopped</code>.",
+      postArgs: "Arguments that go after the image name in the <code>docker run</code> command. The app inside the container receives them.",
+      memory: "The most memory the container can use (<code>--memory</code>). Use bytes, or add <code>b</code>, <code>k</code>, <code>m</code>, or <code>g</code>, e.g. <code>2g</code>. The minimum is <code>6m</code>. Leave it empty for no limit.",
+      cpu: "The CPU threads that the container can run on. Select none to let it use all threads.",
+      cpuThreads: "How many CPU threads to show. Set it to the thread count of your server.",
+      fileName: "Unraid saves user templates as <code class=\"nw\">my-&lt;name&gt;.xml</code> in <code>/boot/<wbr>config/<wbr>plugins/<wbr>dockerMan/<wbr>templates-user</code>.",
+      configs: "<b>Path</b>: maps a server folder or file into the container.<br><b>Port</b>: maps a server port to a container port.<br><b>Variable</b>: sets an environment variable.<br><b>Label</b>: adds a Docker label.<br><b>Device</b>: passes a server device into the container.",
+      "cfg.name": "The label for this field on the Add Container page.",
+      "cfg.display": "<b>Always</b>: shows in the main list.<br><b>Advanced</b>: shows only under Show more settings.<br><b>Hide buttons</b>: shows the Edit and Remove buttons only in Advanced view.",
+      "cfg.Path.target": "The path inside the container, e.g. <code>/config</code>.",
+      "cfg.Path.value": "The path on the Unraid server, e.g. <code>/mnt/user/appdata/app</code>.",
+      "cfg.Path.mode": "<b>Read/Write</b> or <b>Read only</b> access to the path.<br><b>Slave</b>: drives that mount on the server later also show in the container.<br><b>Shared</b>: mounts show in both directions.",
+      "cfg.Port.target": "The port that the app listens on inside the container.",
+      "cfg.Port.value": "The port on the Unraid server that connects to the container port. Change this one if the port is already in use.",
+      "cfg.Port.mode": "The protocol for this port: TCP or UDP.",
+      "cfg.Variable.target": "The name of the environment variable, e.g. <code>PUID</code>.",
+      "cfg.Variable.value": "The value of the environment variable.",
+      "cfg.Label.target": "The Docker label key, e.g. <code>com.example.key</code>.",
+      "cfg.Label.value": "The Docker label value.",
+      "cfg.Device.value": "The server device to pass into the container, e.g. <code>/dev/dri</code>.",
+      "cfg.default": "The suggested value. For a variable, separate options with <code>|</code> to show a drop-down list.",
+      "cfg.description": "Help text that shows under the field on the Add Container page.",
+      "cfg.required": "Unraid does not create the container while this field is empty.",
+      "cfg.mask": "Hides the value like a password on the Add Container page.",
+      "ts.enabled": "Installs Tailscale in the container and adds the container as a machine on your tailnet. Works with Bridge, None, and Custom networks.",
+      "ts.hostname": "The container's name on your tailnet. It must be unique. With Serve or Funnel, this name goes into a public certificate log.",
+      "ts.isExitNode": "Lets other machines on your tailnet send their internet traffic through this container. Approve the exit node in the Tailscale admin console.",
+      "ts.exitNodeIP": "Sends this container's internet traffic through an exit node on your tailnet. Enter the Tailscale IP or hostname of the exit node.",
+      "ts.userspace": "<b>Enabled</b>: other tailnet machines can reach the container. The container cannot start connections to them, and Tailscale DNS does not work.<br><b>Disabled</b>: full tailnet access. LAN devices may need Tailscale to reach the container.",
+      "ts.lanAccess": "Lets the container reach your local network while it uses an exit node.",
+      "ts.ssh": "Lets you open a shell in the container with an SSH client. Tailscale does the sign-in.",
+      "ts.serve": "<b>Serve</b>: publishes the container's web service to your tailnet over HTTPS.<br><b>Funnel</b>: publishes it to the public internet. Use with care.<br>The app must still handle its own sign-in.",
+      "ts.servePort": "The port of the web service inside the container, not the mapped server port. Unraid reads it from the WebUI field if you leave it empty.",
+      "ts.serveTarget": "The target for <code>tailscale serve</code>. The default is <code>http://localhost</code>. Only <code>localhost</code> and <code>127.0.0.1</code> work.",
+      "ts.serveLocalPath": "A path that goes after the target port in the serve command. The default is empty.",
+      "ts.serveProtocol": "The protocol for the serve command. The default is <code>https</code>.",
+      "ts.serveProtocolPort": "The port for the serve command, with a leading <code>=</code>. The default is <code>=443</code>.",
+      "ts.servePath": "The URL path to serve on. The default is empty.",
+      "ts.webui": "The WebUI address over Tailscale. The page makes it from the WebUI field and the Serve setting.",
+      "ts.routes": "Subnets to share with your tailnet, passed to <code>--advertise-routes</code>, e.g. <code>192.168.1.0/24</code>.",
+      "ts.acceptRoutes": "Lets the container use subnet routes that other tailnet machines share (<code>--accept-routes</code>).",
+      "ts.daemonParams": "More options for the <code>tailscaled</code> daemon.",
+      "ts.extraParams": "More options for the <code>tailscale up</code> command.",
+      "ts.stateDir": "A folder in the container where Tailscale keeps its state. Set it only if detection fails, e.g. <code>/config/.tailscale_state</code>.",
+      "ts.troubleshooting": "Installs <code>ping</code>, <code>nslookup</code>, <code>curl</code>, and <code>speedtest-cli</code> in the container. Turn it off when you are done.",
+    };
+
+    // ---------- State ----------
+    const defaultTS = () => ({
+      enabled: false, hostname: "", isExitNode: "false", exitNodeIP: "", lanAccess: "false",
+      userspace: "true", ssh: "false", serve: "no", servePort: "", serveTarget: "", serveLocalPath: "",
+      serveProtocol: "", serveProtocolPort: "", servePath: "", routes: "", acceptRoutes: "false",
+      daemonParams: "", extraParams: "", stateDir: "", troubleshooting: false, webui: "",
+    });
+    const defaults = () => ({
+      name: "", repository: "", registry: "", icon: "", webui: "", overview: "", requires: "",
+      categories: [], support: "", project: "", readme: "", templateURL: "", donateText: "", donateLink: "",
+      network: "bridge", customNetwork: "", containerNetwork: "", myIP: "", myMAC: "", extraNetworks: "",
+      shell: "sh", privileged: false, extraParams: "", postArgs: "", memory: "", cpuset: [], cpuThreads: 8,
+      configs: [], ts: defaultTS(), fileName: "", fileNameTouched: false,
+    });
+
+    let uid = 0;
+    let state = load();
+    uid = Math.max(uid, ...state.configs.map(c => c.id || 0));
+    const ui = { tsAdvanced: false, wrap: true, showAllIssues: false, touched: new Set() };
+
+    function load() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (!raw || typeof raw !== "object") return defaults();
+        const s = Object.assign(defaults(), raw);
+        s.ts = Object.assign(defaultTS(), raw.ts || {});
+        s.configs = Array.isArray(raw.configs) ? raw.configs.map(normalizeConfig) : [];
+        return s;
+      } catch { return defaults(); }
+    }
+    let saveTimer;
+    function save() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+      }, 250);
+    }
+
+    function normalizeConfig(c) {
+      const type = TYPES[c.type] ? c.type : "Variable";
+      const modes = TYPES[type].modes;
+      const mode = modes ? (modes.some(m => m[0] === c.mode) ? c.mode : modes[0][0]) : (c.mode ?? "");
+      const display = DISPLAY.some(d => d[0] === c.display) ? c.display : "always";
+      return {
+        id: c.id || ++uid, type, name: c.name ?? "", target: c.target ?? "", value: c.value ?? "",
+        default: c.default ?? "", mode,
+        description: c.description ?? "", display,
+        required: c.required === true || c.required === "true",
+        mask: c.mask === true || c.mask === "true",
+        open: !!c.open,
+      };
+    }
+
+    const getPath = (obj, path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
+    const setPath = (obj, path, val) => {
+      const keys = path.split("."); const last = keys.pop();
+      const target = keys.reduce((o, k) => o[k], obj); target[last] = val;
+    };
+
+    // ---------- Derived values ----------
+    const tsAllowed = s => !["host", "container"].includes(s.network);
+    const cleanName = s => s.name.replace(/\s+/g, "");
+    const fileBase = () => {
+      const raw = (state.fileNameTouched ? state.fileName : cleanName(state)).trim();
+      return raw.replace(/^my-/i, "").replace(/\.xml$/i, "").replace(/[\\/:*?"<>|\s]+/g, "-") || "container";
+    };
+    const fileName = () => "my-" + fileBase() + ".xml";
+
+    function networkValue(s) {
+      if (s.network === "custom") return s.customNetwork.trim();
+      if (s.network === "container") return s.containerNetwork.trim() ? "container:" + s.containerNetwork.trim() : "container";
+      return s.network;
+    }
+    function normalizeMAC(v) {
+      let m = v.trim().replace(/-/g, ":").toLowerCase();
+      if (/^[0-9a-f]{12}$/.test(m)) m = m.match(/.{2}/g).join(":");
+      return m;
+    }
+    function categoryValue(s) {
+      const known = CATEGORY_ORDER.filter(c => s.categories.includes(c));
+      const extra = s.categories.filter(c => !CATEGORY_ORDER.includes(c));
+      return [...known, ...extra].join(" ");
+    }
+    // Port of generateTSwebui() from Unraid's Helpers.php
+    function tsWebUI(url, serve, webUI) {
+      webUI = webUI || "";
+      const port = (webUI.match(/\[PORT:(\d+)\]/) || [])[1];
+      const rest = webUI.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i, "").split("#")[0];
+      const qi = rest.indexOf("?");
+      const path = qi === -1 ? rest : rest.slice(0, qi);
+      const query = qi === -1 ? "" : rest.slice(qi);
+      const build = () => (serve === "serve" || serve === "funnel")
+        ? "https://[hostname][magicdns]" + path + query
+        : "http://[noserve]" + (port ? ":" + port : "") + path + query;
+      if (url) return (url.includes("[hostname]") || url.includes("[noserve]")) ? build() : url;
+      return webUI ? build() : "";
+    }
+
+    // ---------- XML ----------
+    const escText = v => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const escAttr = v => escText(v).replace(/"/g, "&quot;").replace(/\n/g, "&#10;").replace(/\r/g, "&#13;").replace(/\t/g, "&#9;");
+
+    function buildXML(s) {
+      const out = ['<?xml version="1.0"?>', '<Container version="2">'];
+      const el = (tag, val) => {
+        const v = val == null ? "" : String(val);
+        out.push(v === "" ? `  <${tag}/>` : `  <${tag}>${escText(v)}</${tag}>`);
+      };
+      const showMAC = ["bridge", "custom"].includes(s.network);
+      const showExtraNets = ["bridge", "custom"].includes(s.network);
+
+      el("Name", cleanName(s));
+      el("Repository", s.repository.trim());
+      el("Registry", s.registry.trim());
+      el("Network", networkValue(s));
+      el("ExtraNetworks", showExtraNets ? s.extraNetworks.split(/[\s,]+/).filter(Boolean).join(",") : "");
+      el("MyIP", s.network === "custom" ? s.myIP.trim() : "");
+      el("MyMAC", showMAC ? normalizeMAC(s.myMAC) : "");
+      el("Shell", s.shell);
+      el("Privileged", s.privileged ? "true" : "false");
+      el("Support", s.support);
+      el("Project", s.project);
+      el("ReadMe", s.readme);
+      el("Overview", s.overview);
+      el("Category", categoryValue(s));
+      el("WebUI", s.webui.trim());
+      el("TemplateURL", s.templateURL);
+      el("Icon", s.icon.trim());
+      el("ExtraParams", s.extraParams);
+      el("PostArgs", s.postArgs);
+      el("CPUset", [...s.cpuset].sort((a, b) => a - b).join(","));
+      el("Memory", s.memory.trim());
+      el("DateInstalled", Math.floor(Date.now() / 1000));
+      el("DonateText", s.donateText);
+      el("DonateLink", s.donateLink);
+      el("Requires", s.requires);
+
+      for (const c of s.configs) {
+        let target = c.target, def = c.default, mode = c.mode;
+        if (c.type === "Device") { target = ""; def = ""; }
+        if (c.type === "Port" && s.network === "host") target = c.value;
+        if (!TYPES[c.type].modes) mode = "";
+        const attrs = [
+          ["Name", c.name], ["Target", target], ["Default", def], ["Mode", mode],
+          ["Description", c.description], ["Type", c.type], ["Display", c.display],
+          ["Required", c.required ? "true" : "false"], ["Mask", c.mask ? "true" : "false"],
+        ].map(([k, v]) => `${k}="${escAttr(v)}"`).join(" ");
+        out.push(c.value === "" ? `  <Config ${attrs}/>` : `  <Config ${attrs}>${escText(c.value)}</Config>`);
+      }
+
+      const t = s.ts;
+      if (t.enabled && tsAllowed(s)) {
+        el("TailscaleEnabled", "true");
+        el("TailscaleIsExitNode", t.isExitNode);
+        el("TailscaleHostname", t.hostname.trim());
+        el("TailscaleExitNodeIP", t.exitNodeIP.trim());
+        el("TailscaleSSH", t.ssh);
+        el("TailscaleUserspaceNetworking", t.userspace);
+        el("TailscaleLANAccess", t.lanAccess);
+        el("TailscaleServe", t.serve);
+        el("TailscaleWebUI", tsWebUI(t.webui, t.serve, s.webui.trim()));
+        if (t.serve !== "no") {
+          el("TailscaleServePort", t.servePort.trim());
+          el("TailscaleServeTarget", t.serveTarget.trim());
+          el("TailscaleServeLocalPath", t.serveLocalPath.trim());
+          el("TailscaleServeProtocol", t.serveProtocol.trim());
+          el("TailscaleServeProtocolPort", t.serveProtocolPort.trim());
+          el("TailscaleServePath", t.servePath.trim());
+        }
+        el("TailscaleDParams", t.daemonParams);
+        el("TailscaleParams", t.extraParams);
+        el("TailscaleRoutes", t.routes.trim());
+        el("TailscaleAcceptRoutes", t.acceptRoutes);
+        if (t.troubleshooting) el("TailscaleTroubleshooting", "true");
+      }
+      el("TailscaleStateDir", t.stateDir.trim());
+      out.push("</Container>");
+      return out.join("\n") + "\n";
+    }
+
+    function highlightLine(line) {
+      const h = v => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return line.replace(/(<\?[^>]*\?>)|(<\/?)([\w:.-]+)((?:\s+[\w:.-]+="[^"]*")*)(\s*\/?>)|([^<]+)/g,
+        (m, pi, open, tag, attrs, close, text) => {
+          if (pi) return `<span class="tok-pi">${h(pi)}</span>`;
+          if (tag) {
+            const a = (attrs || "").replace(/(\s+)([\w:.-]+)=("[^"]*")/g,
+              (_, sp, n, v) => `${sp}<span class="tok-attr">${n}</span><span class="tok-punc">=</span><span class="tok-val">${h(v)}</span>`);
+            return `<span class="tok-punc">${h(open)}</span><span class="tok-tag">${tag}</span>${a}<span class="tok-punc">${h(close)}</span>`;
+          }
+          return `<span class="tok-text">${h(text)}</span>`;
+        });
+    }
+
+    // ---------- Validation ----------
+    function validate(s) {
+      const issues = [];
+      const add = (key, msg, required = false) => issues.push({ key, msg, required });
+      const name = cleanName(s);
+      if (!name) add("name", "Name is required", true);
+      else if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]+$/.test(name)) add("name", "Name: use 2+ letters, digits, _ . -");
+      if (!s.repository.trim()) add("repository", "Repository is required", true);
+      if (s.network === "custom" && !s.customNetwork.trim()) add("customNetwork", "Custom network name is required", true);
+      if (s.network === "container" && !s.containerNetwork.trim()) add("containerNetwork", "Container to use is required", true);
+      if (s.network === "custom" && s.myIP.trim() && !/^[0-9a-fA-F:.]+$/.test(s.myIP.trim())) add("myIP", "Fixed IP address is not valid");
+      if (["bridge", "custom"].includes(s.network) && s.myMAC.trim() && !/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/.test(normalizeMAC(s.myMAC))) add("myMAC", "Fixed MAC address is not valid");
+      if (s.memory.trim() && !/^[0-9]+[bkmgBKMG]?$/.test(s.memory.trim())) add("memory", "Memory limit: use a number with b, k, m, or g");
+      for (const c of s.configs) {
+        const label = c.name || c.type;
+        if (!c.name.trim()) add(`cfg:${c.id}:name`, `${c.type}: name is required`, true);
+        if (["Path", "Variable", "Label"].includes(c.type) && !c.target.trim()) add(`cfg:${c.id}:target`, `${label}: ${TYPES[c.type].target.toLowerCase()} is required`, true);
+        if (c.type === "Path" && c.target.trim() && !c.target.trim().startsWith("/")) add(`cfg:${c.id}:target`, `${label}: container path must start with /`);
+        if (c.type === "Port") {
+          if (s.network !== "host" && !c.target.trim()) add(`cfg:${c.id}:target`, `${label}: container port is required`, true);
+          if (c.target.trim() && !/^\d+$/.test(c.target.trim())) add(`cfg:${c.id}:target`, `${label}: container port must be a number`);
+          if (c.value.trim() && !/^\d+$/.test(c.value.trim())) add(`cfg:${c.id}:value`, `${label}: host port must be a number`);
+        }
+        if (c.type === "Device" && !c.value.trim()) add(`cfg:${c.id}:value`, `${label}: device is required`, true);
+      }
+      if (s.ts.enabled && tsAllowed(s)) {
+        if (!/^[A-Za-z0-9_-]*$/.test(s.ts.hostname)) add("ts.hostname", "Tailscale hostname: use letters, digits, _ -");
+        if (!/^[0-9:., /]*$/.test(s.ts.routes)) add("ts.routes", "Advertise routes: use IPs and CIDR ranges");
+      }
+      return issues;
+    }
+
+    const fieldFor = key => key.startsWith("cfg:")
+      ? (() => { const [, id, k] = key.split(":"); return $(`[data-entry="${id}"] [data-key="${k}"]`); })()
+      : $(`[data-bind="${key}"]`);
+
+    function renderIssues() {
+      const all = validate(state);
+      $$("[aria-invalid]").forEach(e => e.removeAttribute("aria-invalid"));
+      const visible = all.filter(i => !i.required || ui.showAllIssues || ui.touched.has(i.key));
+      const box = $("#issues");
+      box.innerHTML = "";
+      box.classList.toggle("hidden", !visible.length);
+      box.classList.toggle("flex", !!visible.length);
+      for (const i of visible) {
+        const f = fieldFor(i.key);
+        if (f) f.setAttribute("aria-invalid", "true");
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-red-500/10 px-2 py-1 text-xs font-medium text-red-300 ring-1 ring-red-500/20 transition hover:bg-red-500/20 hover:text-red-200";
+        b.innerHTML = svg("alert", "size-3.5") + `<span></span>`;
+        b.lastChild.textContent = i.msg;
+        b.addEventListener("click", () => focusField(i.key));
+        box.appendChild(b);
+      }
+      return all;
+    }
+
+    function focusField(key) {
+      if (key.startsWith("cfg:")) {
+        const id = +key.split(":")[1];
+        const c = state.configs.find(x => x.id === id);
+        if (c && !c.open) { c.open = true; $(`[data-entry="${id}"]`).dataset.collapsed = "false"; }
+      }
+      const f = fieldFor(key);
+      if (!f) return;
+      f.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => f.focus({ preventScroll: true }), 250);
+    }
+
+    // ---------- Rendering ----------
+    function renderCategories() {
+      const box = $("#categories");
+      box.innerHTML = CATEGORY_GROUPS.map(g => `
+        <div class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-3">
+          <span class="w-24 shrink-0 pt-1 text-xs text-zinc-500">${g.label}</span>
+          <div class="flex flex-wrap gap-1.5">
+            ${g.items.map(([v, l]) => `<button type="button" class="chip" data-cat="${v}" aria-pressed="${state.categories.includes(v)}">${l}</button>`).join("")}
+          </div>
+        </div>`).join("");
+    }
+
+    function renderCPUs() {
+      const n = Math.min(256, Math.max(1, parseInt(state.cpuThreads, 10) || 1));
+      const box = $("#cpus");
+      let html = "";
+      for (let i = 0; i < n; i++) {
+        html += `<button type="button" class="chip w-10 px-0 text-center font-mono" data-cpu="${i}" aria-pressed="${state.cpuset.includes(i)}">${i}</button>`;
+      }
+      box.innerHTML = html;
+    }
+
+    function renderAddButtons() {
+      $("#config-add").innerHTML = Object.keys(TYPES).map(t => `
+        <button type="button" class="btn group border border-dashed border-white/10 bg-transparent text-zinc-400 hover:border-white/25 hover:bg-white/[0.03] hover:text-zinc-100 ${t === "Device" ? "col-span-2 sm:col-span-1" : ""}" data-add="${t}">
+          <span class="grid size-5 place-items-center rounded-md ring-1 ${TYPES[t].tone}">${svg(t, "size-3")}</span>${t}
+        </button>`).join("");
+    }
+
+    function summary(c) {
+      const host = state.network === "host";
+      if (c.type === "Device") return c.value || "—";
+      if (c.type === "Path") return `${c.target || "?"} → ${c.value || "?"}${c.mode && c.mode !== "rw" ? "  ·  " + c.mode : ""}`;
+      if (c.type === "Port") return host ? `${c.value || "?"}/${c.mode}` : `${c.target || "?"} → ${c.value || "?"}/${c.mode}`;
+      return `${c.target || "?"}=${c.mask && c.value ? "••••••" : c.value}`;
+    }
+
+    function entryHTML(c, i, total) {
+      const T = TYPES[c.type];
+      const host = state.network === "host";
+      const showTarget = c.type !== "Device" && !(c.type === "Port" && host);
+      const showDefault = c.type !== "Device";
+      const showMode = !!T.modes;
+      const opt = (list, val) => list.map(([v, l]) => `<option value="${v}"${v === val ? " selected" : ""}>${l}</option>`).join("");
+      return `
+      <div class="rounded-xl border border-white/[0.07] bg-zinc-950/40 transition hover:border-white/[0.12]" data-entry="${c.id}" data-collapsed="${!c.open}">
+        <div class="flex items-center gap-1 py-2 pr-2 pl-2.5">
+          <button type="button" class="group flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-lg py-0.5 text-left" data-act="toggle">
+            <span class="text-zinc-500 transition-transform group-hover:text-zinc-200" data-chevron>${svg("chevron")}</span>
+            <span class="grid size-8 shrink-0 place-items-center rounded-lg ring-1 ${T.tone}">${svg(c.type)}</span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-sm font-medium text-zinc-100" data-sum="name"></span>
+              <span class="block truncate font-mono text-xs text-zinc-500" data-sum="detail"></span>
+            </span>
+          </button>
+          <button type="button" class="icon-btn" data-act="up" title="Move up"${i === 0 ? " disabled" : ""}>${svg("up")}</button>
+          <button type="button" class="icon-btn" data-act="down" title="Move down"${i === total - 1 ? " disabled" : ""}>${svg("down")}</button>
+          <button type="button" class="icon-btn" data-act="dup" title="Duplicate">${svg("dup")}</button>
+          <button type="button" class="icon-btn hover:!bg-red-500/10 hover:!text-red-300" data-act="remove" title="Remove">${svg("trash")}</button>
+        </div>
+        <div class="grid gap-3 border-t border-white/[0.06] p-3 sm:grid-cols-2" data-entry-body>
+          <div class="sm:col-span-2">
+            <div class="seg">
+              ${Object.keys(TYPES).map(t => `<label><input type="radio" name="type-${c.id}" value="${t}" data-key="type"${t === c.type ? " checked" : ""}>${t}</label>`).join("")}
+            </div>
+          </div>
+          <div>
+            <label class="label" for="c${c.id}-name" data-tip="cfg.name">Name</label>
+            <input class="input" id="c${c.id}-name" data-key="name">
+          </div>
+          <div>
+            <label class="label" for="c${c.id}-display" data-tip="cfg.display">Display</label>
+            <select class="input" id="c${c.id}-display" data-key="display">${opt(DISPLAY, c.display)}</select>
+          </div>
+          ${showTarget ? `<div>
+            <label class="label" for="c${c.id}-target" data-tip="cfg.${c.type}.target">${T.target}</label>
+            <input class="input font-mono text-[13px]" id="c${c.id}-target" data-key="target" placeholder="${T.tp}">
+          </div>` : ""}
+          <div class="${showTarget ? "" : "sm:col-span-2"}">
+            <label class="label" for="c${c.id}-value" data-tip="cfg.${c.type}.value">${T.value}</label>
+            <input class="input font-mono text-[13px]" id="c${c.id}-value" data-key="value" placeholder="${T.vp}">
+          </div>
+          ${showDefault ? `<div class="${showMode ? "" : "sm:col-span-2"}">
+            <label class="label" for="c${c.id}-default" data-tip="cfg.default">Default value</label>
+            <input class="input font-mono text-[13px]" id="c${c.id}-default" data-key="default">
+          </div>` : ""}
+          ${showMode ? `<div>
+            <label class="label" for="c${c.id}-mode" data-tip="cfg.${c.type}.mode">${c.type === "Path" ? "Access mode" : "Protocol"}</label>
+            <select class="input" id="c${c.id}-mode" data-key="mode">${opt(T.modes, c.mode)}</select>
+          </div>` : ""}
+          <div class="sm:col-span-2">
+            <label class="label" for="c${c.id}-desc" data-tip="cfg.description">Description</label>
+            <textarea class="input !min-h-[3.25rem]" id="c${c.id}-desc" data-key="description" rows="2"></textarea>
+          </div>
+          <label class="toggle-row">
+            <input type="checkbox" class="peer" data-key="required"${c.required ? " checked" : ""}>
+            <span class="flex items-center gap-1.5" data-tip="cfg.required">Required</span>
+            <span class="switch-track"></span>
+          </label>
+          <label class="toggle-row">
+            <input type="checkbox" class="peer" data-key="mask"${c.mask ? " checked" : ""}>
+            <span class="flex items-center gap-1.5" data-tip="cfg.mask">Mask value</span>
+            <span class="switch-track"></span>
+          </label>
+        </div>
+      </div>`;
+    }
+
+    function renderConfigs() {
+      const box = $("#configs");
+      box.innerHTML = state.configs.map((c, i) => entryHTML(c, i, state.configs.length)).join("");
+      // Set text values via properties so user text never becomes markup.
+      for (const c of state.configs) {
+        const root = $(`[data-entry="${c.id}"]`);
+        for (const k of ["name", "target", "value", "default", "description"]) {
+          const f = $(`[data-key="${k}"]`, root);
+          if (f) f.value = c[k];
+        }
+        updateSummary(c);
+      }
+      box.classList.toggle("mb-3", state.configs.length > 0);
+      $("#config-count").textContent = state.configs.length;
+      decorateTips(box);
+    }
+
+    function updateSummary(c) {
+      const root = $(`[data-entry="${c.id}"]`);
+      if (!root) return;
+      const n = $('[data-sum="name"]', root);
+      n.textContent = c.name || `Unnamed ${c.type.toLowerCase()}`;
+      n.classList.toggle("text-zinc-500", !c.name);
+      $('[data-sum="detail"]', root).textContent = summary(c);
+    }
+
+    const SHOW = {
+      "net-custom": s => s.network === "custom",
+      "net-container": s => s.network === "container",
+      "net-mac": s => ["bridge", "custom"].includes(s.network),
+      "net-extra": s => ["bridge", "custom"].includes(s.network),
+      "ts-on": s => s.ts.enabled && tsAllowed(s),
+      "ts-lan": s => !!s.ts.exitNodeIP.trim(),
+      "ts-serve": s => s.ts.serve !== "no",
+      "ts-adv": () => ui.tsAdvanced,
+    };
+
+    // Mirrors the option locks in Unraid's Tailscale form.
+    function applyTailscaleRules() {
+      const t = state.ts;
+      const allowed = tsAllowed(state);
+      if (!allowed) t.enabled = false;
+      if (t.isExitNode === "true") { t.userspace = "true"; t.exitNodeIP = ""; }
+      if (t.userspace === "true") t.exitNodeIP = "";
+      if (t.exitNodeIP.trim()) { t.userspace = "false"; t.isExitNode = "false"; }
+      else t.lanAccess = "false";
+
+      const tog = $("#f-ts-enabled");
+      tog.disabled = !allowed;
+      $("#ts-blocked").classList.toggle("hidden", allowed);
+      const exitIP = $("#f-ts-exitip");
+      exitIP.disabled = t.userspace === "true" || t.isExitNode === "true";
+      exitIP.placeholder = t.isExitNode === "true" ? "Not available on an exit node"
+        : t.userspace === "true" ? "Turn off userspace networking first" : "IP or hostname of the exit node";
+      $('input[name="ts-exit"][value="true"]').disabled = !!t.exitNodeIP.trim();
+      $('input[name="ts-us"][value="false"]').disabled = t.isExitNode === "true";
+      $('input[name="ts-us"][value="true"]').disabled = !!t.exitNodeIP.trim();
+      $("#f-ts-webui").value = tsWebUI(t.webui, t.serve, state.webui.trim());
+      $("#ts-adv-toggle").setAttribute("aria-expanded", ui.tsAdvanced);
+    }
+
+    function populate() {
+      for (const el of $$("[data-bind]")) {
+        const v = getPath(state, el.dataset.bind);
+        if (el.type === "checkbox") el.checked = !!v;
+        else if (el.type === "radio") el.checked = el.value === String(v);
+        else if (document.activeElement !== el) el.value = v ?? "";
+      }
+      const fn = $("#f-filename");
+      if (document.activeElement !== fn) fn.value = state.fileNameTouched ? state.fileName : "";
+      fn.placeholder = fileBase();
+    }
+
+    let codeTimer;
+    function update({ repopulate = true } = {}) {
+      applyTailscaleRules();
+      if (repopulate) populate();
+      for (const el of $$("[data-show]")) {
+        el.hidden = !el.dataset.show.split(/\s+/).every(k => SHOW[k](state));
+      }
+      // Icon preview
+      const url = state.icon.trim(), img = $("#icon-preview");
+      if (url && img.dataset.src !== url) { img.dataset.src = url; img.src = url; }
+      if (!url) { img.dataset.src = ""; img.removeAttribute("src"); img.classList.add("hidden"); $("#icon-empty").classList.remove("hidden"); }
+      $("#f-filename").placeholder = fileBase();
+      $('[data-step="-1"]').disabled = state.cpuThreads <= 1;
+      $('[data-step="1"]').disabled = state.cpuThreads >= 256;
+      renderIssues();
+      clearTimeout(codeTimer);
+      codeTimer = setTimeout(renderCode, 60);
+      save();
+    }
+
+    function renderCode() {
+      const xml = buildXML(state);
+      const lines = xml.replace(/\n$/, "").split("\n");
+      $("#code").innerHTML = lines.map((l, i) => {
+        const pad = l.match(/^ */)[0].length + 4;
+        return `<div class="code-line"><span class="code-ln">${i + 1}</span><span class="code-lc" style="padding-left:${pad}ch;text-indent:-${pad}ch">${highlightLine(l) || " "}</span></div>`;
+      }).join("");
+    }
+
+    // ---------- Events ----------
+    document.addEventListener("input", e => {
+      const el = e.target;
+      if (el.dataset.bind) {
+        let v = el.type === "checkbox" ? el.checked : el.value;
+        if (el.type === "radio" && !el.checked) return;
+        if (el.dataset.bind === "cpuThreads") {
+          v = parseInt(v, 10);
+          if (!v || v < 1) return;
+          v = Math.min(256, v);
+          state.cpuset = state.cpuset.filter(x => x < v);
+        }
+        setPath(state, el.dataset.bind, v);
+        if (el.dataset.bind === "cpuThreads") renderCPUs();
+        if (el.dataset.bind === "network") renderConfigs();
+        const radioOrBox = el.type === "radio" || el.type === "checkbox";
+        update({ repopulate: radioOrBox || el.dataset.bind.startsWith("ts.") });
+        return;
+      }
+      const entry = el.closest("[data-entry]");
+      if (entry && el.dataset.key) {
+        const c = state.configs.find(x => x.id === +entry.dataset.entry);
+        const k = el.dataset.key;
+        if (k === "type") {
+          if (!el.checked) return;
+          c.type = el.value;
+          c.mode = TYPES[c.type].modes ? TYPES[c.type].modes[0][0] : "";
+          if (/^Host (Path|Port|Key|Label|Device) \d+$/.test(c.name)) c.name = makeName(c.type, c.id);
+          renderConfigs();
+          $(`[data-entry="${c.id}"] input[data-key="type"][value="${c.type}"]`)?.focus();
+        } else {
+          c[k] = el.type === "checkbox" ? el.checked : el.value;
+          updateSummary(c);
+        }
+        update({ repopulate: false });
+      }
+    });
+    document.addEventListener("focusout", e => {
+      const el = e.target;
+      let key = el.dataset?.bind;
+      const entry = el.closest?.("[data-entry]");
+      if (!key && entry && el.dataset.key) key = `cfg:${entry.dataset.entry}:${el.dataset.key}`;
+      if (key && !ui.touched.has(key)) { ui.touched.add(key); renderIssues(); }
+      if (el.dataset?.bind === "cpuThreads") el.value = state.cpuThreads;
+    });
+
+    $("#f-filename").addEventListener("input", e => {
+      state.fileName = e.target.value;
+      state.fileNameTouched = e.target.value.trim() !== "";
+      update({ repopulate: false });
+    });
+
+    $("#categories").addEventListener("click", e => {
+      const b = e.target.closest("[data-cat]"); if (!b) return;
+      const v = b.dataset.cat;
+      state.categories = state.categories.includes(v) ? state.categories.filter(x => x !== v) : [...state.categories, v];
+      b.setAttribute("aria-pressed", state.categories.includes(v));
+      update({ repopulate: false });
+    });
+
+    $("#cpus").addEventListener("click", e => {
+      const b = e.target.closest("[data-cpu]"); if (!b) return;
+      const n = +b.dataset.cpu;
+      state.cpuset = state.cpuset.includes(n) ? state.cpuset.filter(x => x !== n) : [...state.cpuset, n];
+      b.setAttribute("aria-pressed", state.cpuset.includes(n));
+      update({ repopulate: false });
+    });
+    $("#cpu-clear").addEventListener("click", () => { state.cpuset = []; renderCPUs(); update({ repopulate: false }); });
+
+    function makeName(type, exceptId) {
+      const word = type === "Variable" ? "Key" : type;
+      const n = state.configs.filter(c => c.type === type && c.id !== exceptId).length + 1;
+      return `Host ${word} ${n}`;
+    }
+
+    $("#config-add").addEventListener("click", e => {
+      const b = e.target.closest("[data-add]"); if (!b) return;
+      const type = b.dataset.add;
+      const c = normalizeConfig({ id: ++uid, type, name: makeName(type), open: true });
+      state.configs.push(c);
+      renderConfigs();
+      update({ repopulate: false });
+      const root = $(`[data-entry="${c.id}"]`);
+      root.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      $('[data-key="name"]', root).select();
+    });
+
+    $("#configs").addEventListener("click", e => {
+      const b = e.target.closest("[data-act]"); if (!b) return;
+      const root = b.closest("[data-entry]");
+      const idx = state.configs.findIndex(x => x.id === +root.dataset.entry);
+      const c = state.configs[idx];
+      switch (b.dataset.act) {
+        case "toggle":
+          c.open = !c.open; root.dataset.collapsed = String(!c.open); save(); return;
+        case "up": case "down": {
+          const j = b.dataset.act === "up" ? idx - 1 : idx + 1;
+          if (j < 0 || j >= state.configs.length) return;
+          [state.configs[idx], state.configs[j]] = [state.configs[j], state.configs[idx]];
+          renderConfigs();
+          $(`[data-entry="${c.id}"] [data-act="${b.dataset.act}"]`)?.focus();
+          break;
+        }
+        case "dup": {
+          const copy = normalizeConfig({ ...c, id: ++uid, name: c.name ? c.name + " copy" : "", open: true });
+          state.configs.splice(idx + 1, 0, copy);
+          renderConfigs();
+          break;
+        }
+        case "remove": {
+          const [removed] = state.configs.splice(idx, 1);
+          renderConfigs();
+          toast(`Removed ${removed.name || removed.type.toLowerCase()}`, "Undo", () => {
+            state.configs.splice(Math.min(idx, state.configs.length), 0, removed);
+            renderConfigs(); update({ repopulate: false });
+          });
+          break;
+        }
+      }
+      update({ repopulate: false });
+    });
+
+    $("#ts-adv-toggle").addEventListener("click", () => { ui.tsAdvanced = !ui.tsAdvanced; update({ repopulate: false }); });
+
+    $("#icon-preview").addEventListener("load", e => { e.target.classList.remove("hidden"); $("#icon-empty").classList.add("hidden"); });
+    $("#icon-preview").addEventListener("error", e => { e.target.classList.add("hidden"); $("#icon-empty").classList.remove("hidden"); });
+
+    $("#btn-wrap").addEventListener("click", e => {
+      ui.wrap = !ui.wrap;
+      e.currentTarget.setAttribute("aria-pressed", ui.wrap);
+      $("#code-scroll").classList.toggle("nowrap", !ui.wrap);
+    });
+
+
+    // ---------- Tooltips ----------
+    function decorateTips(root = document) {
+      for (const el of $$("[data-tip]", root)) {
+        if ($(".tip-btn", el)) continue;
+        const key = el.dataset.tip;
+        if (!TIPS[key]) continue;
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "tip-btn";
+        b.dataset.tipKey = key;
+        b.setAttribute("aria-label", `About ${el.textContent.trim()}`);
+        b.innerHTML = svg("info");
+        el.appendChild(b);
+      }
+    }
+
+    const tip = $("#tip"), tipBody = $("#tip-body"), tipArrow = $("#tip-arrow");
+    let tipAnchor = null, tipTimer;
+    function showTip(anchor) {
+      const html = TIPS[anchor.dataset.tipKey];
+      if (!html) return;
+      clearTimeout(tipTimer);
+      if (tipAnchor && tipAnchor !== anchor) tipAnchor.removeAttribute("aria-describedby");
+      tipAnchor = anchor;
+      tipBody.innerHTML = html;
+      const r = anchor.getBoundingClientRect(), t = tip.getBoundingClientRect();
+      const margin = 8, gap = 9;
+      let place = "top", top = r.top - t.height - gap;
+      if (top < margin) { place = "bottom"; top = r.bottom + gap; }
+      const left = Math.max(margin, Math.min(r.left + r.width / 2 - t.width / 2, innerWidth - t.width - margin));
+      tip.style.left = `${left}px`;
+      tip.style.top = `${top}px`;
+      tip.dataset.place = place;
+      tipArrow.style.left = `${Math.max(10, Math.min(r.left + r.width / 2 - left - 5, t.width - 20))}px`;
+      anchor.setAttribute("aria-describedby", "tip");
+      tip.dataset.open = "true";
+    }
+    function hideTip() {
+      clearTimeout(tipTimer);
+      if (!tipAnchor) return;
+      tipAnchor.removeAttribute("aria-describedby");
+      tipAnchor = null;
+      tip.dataset.open = "false";
+    }
+    document.addEventListener("mouseover", e => {
+      const a = e.target.closest?.("[data-tip-key]");
+      if (!a || a === tipAnchor) return;
+      clearTimeout(tipTimer);
+      tipTimer = setTimeout(() => showTip(a), tipAnchor ? 0 : 120);
+    });
+    document.addEventListener("mouseout", e => {
+      const a = e.target.closest?.("[data-tip-key]");
+      if (!a || a.contains(e.relatedTarget)) return;
+      clearTimeout(tipTimer);
+      if (a === tipAnchor && !(document.activeElement === a && a.matches(":focus-visible"))) hideTip();
+    });
+    document.addEventListener("focusin", e => {
+      const a = e.target.closest?.("[data-tip-key]");
+      if (a && e.target.matches(":focus-visible")) showTip(a);
+    });
+    document.addEventListener("focusout", e => { if (e.target === tipAnchor) hideTip(); });
+    document.addEventListener("click", e => {
+      const a = e.target.closest("[data-tip-key]");
+      if (a) { e.preventDefault(); showTip(a); }
+      else hideTip();
+    });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") hideTip(); });
+    window.addEventListener("scroll", () => {
+      if (!tipAnchor) return;
+      const r = tipAnchor.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) hideTip(); else showTip(tipAnchor);
+    }, { passive: true, capture: true });
+    window.addEventListener("resize", hideTip);
+
+    // ---------- Threads stepper ----------
+    for (const b of $$("[data-step]")) {
+      b.addEventListener("click", () => {
+        const n = Math.min(256, Math.max(1, (parseInt(state.cpuThreads, 10) || 1) + Number(b.dataset.step)));
+        state.cpuThreads = n;
+        state.cpuset = state.cpuset.filter(x => x < n);
+        renderCPUs();
+        update();
+      });
+    }
+
+    // ---------- Copy / download ----------
+    function flash(btn, text) {
+      const label = $("[data-label]", btn), icon = $("[data-icon]", btn);
+      clearTimeout(btn._t);
+      if (!btn._orig) btn._orig = { label: label.textContent, icon: icon.innerHTML };
+      label.textContent = text; icon.innerHTML = ICONS.check;
+      btn._t = setTimeout(() => { label.textContent = btn._orig.label; icon.innerHTML = btn._orig.icon; }, 1600);
+    }
+    function revealIssues() {
+      ui.showAllIssues = true;
+      const issues = renderIssues();
+      if (issues.length) toast(`${issues.length} issue${issues.length > 1 ? "s" : ""} in the template`);
+    }
+
+    async function copyXML() {
+      const xml = buildXML(state);
+      try { await navigator.clipboard.writeText(xml); }
+      catch {
+        const ta = Object.assign(document.createElement("textarea"), { value: xml });
+        ta.style.cssText = "position:fixed;opacity:0";
+        document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand("copy"); ta.remove();
+        if (!ok) { toast("Copy failed. Select the XML and copy it by hand."); return; }
+      }
+      flash($("#btn-copy"), "Copied");
+      revealIssues();
+    }
+    function downloadXML() {
+      const blob = new Blob([buildXML(state)], { type: "application/xml" });
+      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: fileName() });
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      flash($("#btn-download"), "Saved");
+      revealIssues();
+    }
+    $("#btn-copy").addEventListener("click", copyXML);
+    $("#btn-download").addEventListener("click", downloadXML);
+    document.addEventListener("keydown", e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); downloadXML(); }
+    });
+
+    // ---------- Reset ----------
+    const resetBtn = $("#btn-reset");
+    resetBtn.addEventListener("click", () => {
+      const label = $("[data-label]", resetBtn);
+      if (!resetBtn._armed) {
+        resetBtn._armed = true;
+        label.textContent = "Confirm reset";
+        resetBtn.classList.add("!text-red-300", "!bg-red-500/10");
+        resetBtn._t = setTimeout(disarm, 3000);
+        return;
+      }
+      disarm();
+      const backup = JSON.parse(JSON.stringify(state));
+      state = defaults(); ui.touched.clear(); ui.showAllIssues = false;
+      renderAll();
+      toast("Template cleared", "Undo", () => { state = backup; renderAll(); });
+    });
+    function disarm() {
+      clearTimeout(resetBtn._t); resetBtn._armed = false;
+      $("[data-label]", resetBtn).textContent = "Reset";
+      resetBtn.classList.remove("!text-red-300", "!bg-red-500/10");
+    }
+
+    // ---------- Import ----------
+    function importXML(text, sourceName = "") {
+      const doc = new DOMParser().parseFromString(text, "application/xml");
+      if (doc.getElementsByTagName("parsererror").length) throw new Error("The file is not valid XML.");
+      const root = doc.documentElement;
+      if (!root || root.tagName !== "Container") throw new Error("No <Container> element found.");
+      const kids = [...root.children];
+      const g = tag => { const e = kids.find(k => k.tagName === tag); return e ? e.textContent : ""; };
+      const s = defaults();
+
+      s.name = g("Name").replace(/\s+/g, "");
+      s.repository = g("Repository").trim();
+      s.registry = g("Registry").trim();
+      const net = g("Network").trim() || "bridge";
+      if (net.startsWith("container:")) { s.network = "container"; s.containerNetwork = net.slice(10); }
+      else if (["bridge", "host", "none", "container"].includes(net)) s.network = net;
+      else { s.network = "custom"; s.customNetwork = net; }
+      s.extraNetworks = g("ExtraNetworks").split(/[\s,]+/).filter(Boolean).join(", ");
+      s.myIP = g("MyIP").trim();
+      s.myMAC = g("MyMAC").trim();
+      s.shell = g("Shell").trim() === "bash" ? "bash" : "sh";
+      s.privileged = g("Privileged").trim().toLowerCase() === "true";
+      s.support = g("Support"); s.project = g("Project"); s.readme = g("ReadMe");
+      s.overview = g("Overview") || g("Description");
+      s.categories = g("Category").split(/\s+/).filter(Boolean);
+      s.webui = g("WebUI"); s.templateURL = g("TemplateURL"); s.icon = g("Icon");
+      s.extraParams = g("ExtraParams"); s.postArgs = g("PostArgs");
+      s.cpuset = [...new Set(g("CPUset").split(",").map(x => parseInt(x, 10)).filter(n => n >= 0))];
+      s.cpuThreads = Math.max(8, ...s.cpuset.map(n => n + 1));
+      s.memory = g("Memory"); s.donateText = g("DonateText"); s.donateLink = g("DonateLink"); s.requires = g("Requires");
+
+      s.configs = kids.filter(k => k.tagName === "Config").map(k => normalizeConfig({
+        id: ++uid, type: k.getAttribute("Type"), name: k.getAttribute("Name") || "",
+        target: k.getAttribute("Target") || "", value: k.textContent, default: k.getAttribute("Default") || "",
+        mode: k.getAttribute("Mode") || "", description: k.getAttribute("Description") || "",
+        display: k.getAttribute("Display") || "always", required: k.getAttribute("Required") === "true",
+        mask: k.getAttribute("Mask") === "true", open: false,
+      }));
+
+      const t = s.ts, yn = v => (v.trim() === "true" ? "true" : "false");
+      t.enabled = g("TailscaleEnabled").trim() === "true";
+      t.isExitNode = yn(g("TailscaleIsExitNode"));
+      t.hostname = g("TailscaleHostname"); t.exitNodeIP = g("TailscaleExitNodeIP");
+      t.ssh = yn(g("TailscaleSSH"));
+      t.userspace = g("TailscaleUserspaceNetworking").trim() === "false" ? "false" : "true";
+      t.lanAccess = yn(g("TailscaleLANAccess"));
+      t.serve = ["serve", "funnel"].includes(g("TailscaleServe").trim()) ? g("TailscaleServe").trim() : "no";
+      t.webui = g("TailscaleWebUI");
+      t.servePort = g("TailscaleServePort"); t.serveTarget = g("TailscaleServeTarget");
+      t.serveLocalPath = g("TailscaleServeLocalPath"); t.serveProtocol = g("TailscaleServeProtocol");
+      t.serveProtocolPort = g("TailscaleServeProtocolPort"); t.servePath = g("TailscaleServePath");
+      t.daemonParams = g("TailscaleDParams"); t.extraParams = g("TailscaleParams");
+      t.routes = g("TailscaleRoutes"); t.acceptRoutes = yn(g("TailscaleAcceptRoutes"));
+      t.troubleshooting = g("TailscaleTroubleshooting").trim() === "true";
+      t.stateDir = g("TailscaleStateDir");
+
+      const base = sourceName.replace(/\.xml$/i, "").replace(/^my-/i, "");
+      if (base && base !== s.name) { s.fileName = base; s.fileNameTouched = true; }
+      return s;
+    }
+
+    async function importFile(file) {
+      if (!file) return;
+      try {
+        const backup = JSON.parse(JSON.stringify(state));
+        state = importXML(await file.text(), file.name);
+        ui.touched.clear(); ui.showAllIssues = false;
+        renderAll();
+        toast(`Imported ${file.name}`, "Undo", () => { state = backup; renderAll(); });
+      } catch (err) {
+        toast(err.message || "Import failed.");
+      }
+    }
+    $("#btn-import").addEventListener("click", () => $("#file-import").click());
+    $("#file-import").addEventListener("change", e => { importFile(e.target.files[0]); e.target.value = ""; });
+
+    let dragDepth = 0;
+    const drop = $("#drop");
+    const hasFiles = e => [...(e.dataTransfer?.types || [])].includes("Files");
+    window.addEventListener("dragenter", e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; drop.classList.replace("hidden", "grid"); });
+    window.addEventListener("dragover", e => { if (hasFiles(e)) e.preventDefault(); });
+    window.addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; drop.classList.replace("grid", "hidden"); } });
+    window.addEventListener("drop", e => {
+      if (!hasFiles(e)) return;
+      e.preventDefault(); dragDepth = 0; drop.classList.replace("grid", "hidden");
+      importFile(e.dataTransfer.files[0]);
+    });
+
+    // ---------- Toast ----------
+    let toastTimer;
+    function toast(msg, actionLabel, action) {
+      const el = $("#toast"), btn = $("#toast-action");
+      $("#toast-msg").textContent = msg;
+      btn.classList.toggle("hidden", !actionLabel);
+      btn.textContent = actionLabel || "";
+      btn.onclick = () => { hide(); action?.(); };
+      el.classList.remove("opacity-0", "translate-y-2");
+      clearTimeout(toastTimer);
+      const hide = () => el.classList.add("opacity-0", "translate-y-2");
+      toastTimer = setTimeout(hide, actionLabel ? 5000 : 2600);
+    }
+
+    function renderAll() {
+      renderCategories(); renderCPUs(); renderConfigs();
+      update();
+    }
+
+    renderAddButtons();
+    decorateTips();
+    renderAll();
+  })();
+  </script>
+</body>
+</html>
