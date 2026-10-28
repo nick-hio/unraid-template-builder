@@ -6,6 +6,8 @@
   <a target="_blank" href="https://github.com/nick-hio/unraid-template-builder">GitHub</a>
 </div>
 
+<br>
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nick-hio/unraid-template-builder/refs/heads/main/screenshots/1-overview.png">
@@ -26,7 +28,12 @@
 
 ## Add Template to Unraid
 
-1. Copy the XML file to `/boot/config/plugins/dockerMan/templates-user/` on your Unraid server.
+1. Copy the XML file to your boot drive:
+```bash
+sudo cp /path/to/my-template.xml /boot/config/plugins/dockerMan/templates-user/
+sudo chown root:root /boot/config/plugins/dockerMan/templates-user/my-template.xml
+sudo chmod 600 /boot/config/plugins/dockerMan/templates-user/my-template.xml
+```
 2. In the Unraid web UI, go to **Docker** > **Add Container**.
 3. Select the template from the **Template** list.
 
